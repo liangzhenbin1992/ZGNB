@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能知识库管理工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #303133;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #409eff;
+        }
+        
+        textarea {
+            height: 200px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        
+        .btn {
+            background: #409eff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background: #337ecc;
+        }
+        
+        .btn-success {
+            background: #67c23a;
+        }
+        
+        .btn-success:hover {
+            background: #529b2e;
+        }
+        
+        .btn-danger {
+            background: #f56c6c;
+        }
+        
+        .btn-danger:hover {
+            background: #dd6161;
+        }
+        
+        .btn-warning {
+            background: #e6a23c;
+        }
+        
+        .btn-warning:hover {
+            background: #cf9236;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #f0f9ff;
+            border: 1px solid #d1ecf1;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background: #fef0f0;
+            border: 1px solid #fecaca;
+            color: #721c24;
+        }
+        
+        .alert-info {
+            background: #e1f5fe;
+            border: 1px solid #b3e5fc;
+            color: #01579b;
+        }
+        
+        .existing-content {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e4e7ed;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        
+        .content-item {
+            border: 1px solid #ebeef5;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .content-item:hover {
+            border-color: #409eff;
+            background: #f0f9ff;
+        }
+        
+        .content-item.selected {
+            border-color: #409eff;
+            background: #ecf5ff;
+        }
+        
+        .content-title {
+            font-weight: 600;
+            color: #303133;
+            margin-bottom: 5px;
+        }
+        
+        .content-meta {
+            font-size: 12px;
+            color: #909399;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #909399;
+        }
+        
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 8px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            min-height: 40px;
+        }
+        
+        .tag {
+            background: #f0f2f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .tag-remove {
+            background: none;
+            border: none;
+            color: #909399;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .preview-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .preview-content {
+            font-family: system-ui;
+            line-height: 1.8;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #f0f2f5;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #409eff;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 智能知识库管理工具</h1>
+            <p>一键添加、编辑、删除知识库内容，无需手动操作文件</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-info" id="infoAlert"></div>
+        
+        <div class="content-grid">
+            <!-- 主表单区域 -->
+            <div class="form-section">
+                <h2 id="formTitle">📝 添加新内容</h2>
+                
+                <div class="quick-actions">
+                    <button class="btn" onclick="loadCurrentWeek()">📅 当前周</button>
+                    <button class="btn" onclick="loadNextWeek()">⏭️ 下一周</button>
+                    <button class="btn" onclick="addNewTimePoint()">➕ 添加新时间</button>
+                    <button class="btn" onclick="clearForm()">🗑️ 清空表单</button>
+                    <button class="btn btn-warning" onclick="togglePreview()">👁️ 预览</button>
+                </div>
+                
+                <form id="contentForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="timePoint">⏰ 时间点</label>
+                            <div style="position: relative;">
+                                <input type="text" id="timePoint" list="timePointOptions" placeholder="选择或输入时间点 (如：2025年4月第1周)" required style="position: relative; z-index: 2;">
+                                <datalist id="timePointOptions">
+                                </datalist>
+                                <small style="color: #909399; margin-top: 5px; display: block;">
+                                    💡 可以选择现有时间点，或手动输入新的时间点
+                                </small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="industry">🏭 行业</label>
+                            <select id="industry" required>
+                                <option value="">选择行业</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="importance">⭐ 重要性</label>
+                            <select id="importance" required>
+                                <option value="high">🔴 高</option>
+                                <option value="medium" selected>🟡 中</option>
+                                <option value="low">🟢 低</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="detailId">🆔 详情ID (自动生成)</label>
+                            <input type="text" id="detailId" readonly placeholder="保存后自动生成">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="title">📄 标题</label>
+                        <input type="text" id="title" placeholder="输入内容标题..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="summary">📋 摘要</label>
+                        <textarea id="summary" placeholder="输入内容摘要..." required style="height: 100px;"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tags">🏷️ 标签</label>
+                        <div class="tags-input" id="tagsContainer">
+                            <input type="text" id="tagInput" placeholder="输入标签并按回车..." style="border: none; outline: none; flex: 1; min-width: 120px;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="detailContent">📝 详细内容 (Markdown格式)</label>
+                        <textarea id="detailContent" placeholder="# 标题
+
+## 详细内容
+
+### 子标题
+
+- 要点1
+- 要点2
+
+**重要信息**
+
+详细描述..."></textarea>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button type="submit" class="btn btn-success">💾 保存内容</button>
+                        <button type="button" class="btn btn-warning" onclick="updateContent()" id="updateBtn" style="display: none;">✏️ 更新内容</button>
+                        <button type="button" class="btn btn-danger" onclick="deleteContent()" id="deleteBtn" style="display: none;">🗑️ 删除内容</button>
+                    </div>
+                </form>
+                
+                <!-- 预览区域 -->
+                <div class="preview-section" id="previewSection">
+                    <h3>📖 内容预览</h3>
+                    <div class="preview-content" id="previewContent"></div>
+                </div>
+            </div>
+            
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <h3>📊 现有内容</h3>
+                <div class="form-group">
+                    <input type="text" id="searchContent" placeholder="搜索内容..." onInput="filterContent()">
+                </div>
+                <div class="existing-content" id="existingContent">
+                    <div class="loading">正在加载...</div>
+                </div>
+                
+                <hr style="margin: 20px 0;">
+                
+                <h3>📈 统计信息</h3>
+                <div id="statsInfo">
+                    <p>总内容数: <span id="totalCount">-</span></p>
+                    <p>时间点数: <span id="timePointCount">-</span></p>
+                    <p>行业数: <span id="industryCount">-</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let knowledgeBase = null;
+        let selectedContent = null;
+        let isEditMode = false;
+        let allTimePoints = [];
+        let allIndustries = [];
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMetadata();
+            loadKnowledgeBase();
+            setupTagInput();
+            setupFormListeners();
+            setupForm();
+        });
+        
+        // 加载元数据
+        async function loadMetadata() {
+            try {
+                console.log('开始加载元数据...');
+                const response = await fetch('http://localhost:3000/api/metadata');
+                console.log('API响应状态:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error('服务器响应错误: ' + response.status);
+                }
+                
+                const metadata = await response.json();
+                console.log('获取到的元数据:', metadata);
+                
+                allTimePoints = metadata.timePoints || [];
+                allIndustries = metadata.industries || [];
+                
+                console.log('时间点:', allTimePoints);
+                console.log('行业:', allIndustries);
+                
+                populateSelects();
+                updateStats();
+                
+                if (allTimePoints.length === 0 || allIndustries.length === 0) {
+                    showAlert('警告: 数据可能不完整', 'info');
+                }
+            } catch (error) {
+                console.error('加载元数据失败:', error);
+                showAlert('加载元数据失败: ' + error.message + ' (请确保服务器正在运行)', 'error');
+                
+                // 提供离线模式的默认数据
+                allTimePoints = ['2025年1月第1周', '2025年1月第2周', '2025年1月第3周', '2025年1月第4周'];
+                allIndustries = ['人工智能', '金融科技', '新能源', '生物医药', '区块链', '半导体', '新材料', '航空航天', '5G通信', '元宇宙', '机器人', '其他'];
+                populateSelects();
+                showAlert('已启用离线模式，功能受限', 'info');
+            }
+        }
+        
+        // 填充下拉列表
+        function populateSelects() {
+            const timePointDatalist = document.getElementById('timePointOptions');
+            const industrySelect = document.getElementById('industry');
+            
+            // 清空现有选项
+            timePointDatalist.innerHTML = '';
+            industrySelect.innerHTML = '<option value="">选择行业</option>';
+            
+            // 添加时间点选项到datalist
+            allTimePoints.forEach(tp => {
+                const option = document.createElement('option');
+                option.value = tp;
+                timePointDatalist.appendChild(option);
+            });
+            
+            // 添加行业选项
+            allIndustries.forEach(industry => {
+                const option = document.createElement('option');
+                option.value = industry;
+                option.textContent = industry;
+                industrySelect.appendChild(option);
+            });
+        }
+        
+        // 加载知识库数据
+        async function loadKnowledgeBase() {
+            try {
+                updateProgress(20);
+                const response = await fetch('http://localhost:3000/api/knowledge-base');
+                knowledgeBase = await response.json();
+                updateProgress(60);
+                displayExistingContent();
+                updateProgress(100);
+                setTimeout(() => updateProgress(0), 1000);
+            } catch (error) {
+                showAlert('加载知识库数据失败: ' + error.message, 'error');
+                updateProgress(0);
+            }
+        }
+        
+        // 显示现有内容
+        function displayExistingContent() {
+            const container = document.getElementById('existingContent');
+            container.innerHTML = '';
+            
+            if (!knowledgeBase || !knowledgeBase.content) {
+                container.innerHTML = '<p class="loading">暂无内容</p>';
+                return;
+            }
+            
+            let hasContent = false;
+            Object.keys(knowledgeBase.content).forEach(timePoint => {
+                Object.keys(knowledgeBase.content[timePoint]).forEach(industry => {
+                    const content = knowledgeBase.content[timePoint][industry];
+                    const item = createContentItem(timePoint, industry, content);
+                    container.appendChild(item);
+                    hasContent = true;
+                });
+            });
+            
+            if (!hasContent) {
+                container.innerHTML = '<p class="loading">暂无内容</p>';
+            }
+        }
+        
+        // 创建内容项
+        function createContentItem(timePoint, industry, content) {
+            const item = document.createElement('div');
+            item.className = 'content-item';
+            item.onclick = () => selectContent(timePoint, industry, content, item);
+            
+            item.innerHTML = '<div class="content-title">' + content.title + '</div>' +
+                           '<div class="content-meta">' + timePoint + ' | ' + industry + ' | ' + content.importance + '</div>';
+            
+            return item;
+        }
+        
+        // 选择内容
+        function selectContent(timePoint, industry, content, element) {
+            // 移除其他选中状态
+            document.querySelectorAll('.content-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 设置选中状态
+            element.classList.add('selected');
+            selectedContent = { timePoint, industry, content };
+            
+            // 填充表单
+            fillForm(timePoint, industry, content);
+            
+            // 切换到编辑模式
+            switchToEditMode();
+        }
+        
+        // 填充表单
+        function fillForm(timePoint, industry, content) {
+            document.getElementById('timePoint').value = timePoint;
+            document.getElementById('industry').value = industry;
+            document.getElementById('title').value = content.title;
+            document.getElementById('summary').value = content.summary;
+            document.getElementById('importance').value = content.importance;
+            document.getElementById('detailId').value = content.detailId;
+            
+            // 清空并重新添加标签
+            clearTags();
+            if (content.tags) {
+                content.tags.forEach(tag => addTag(tag));
+            }
+            
+            // 加载详细内容
+            loadDetailContent(content.detailId);
+        }
+        
+        // 加载详细内容
+        async function loadDetailContent(detailId) {
+            try {
+                const response = await fetch('http://localhost:3000/api/detail/' + detailId);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('detailContent').value = data.content;
+                } else {
+                    document.getElementById('detailContent').value = '';
+                }
+            } catch (error) {
+                console.error('加载详细内容失败:', error);
+                document.getElementById('detailContent').value = '';
+            }
+        }
+        
+        // 切换到编辑模式
+        function switchToEditMode() {
+            isEditMode = true;
+            document.getElementById('formTitle').textContent = '✏️ 编辑内容';
+            document.getElementById('updateBtn').style.display = 'inline-block';
+            document.getElementById('deleteBtn').style.display = 'inline-block';
+            document.querySelector('button[type="submit"]').style.display = 'none';
+        }
+        
+        // 切换到添加模式
+        function switchToAddMode() {
+            isEditMode = false;
+            selectedContent = null;
+            document.getElementById('formTitle').textContent = '📝 添加新内容';
+            document.getElementById('updateBtn').style.display = 'none';
+            document.getElementById('deleteBtn').style.display = 'none';
+            document.querySelector('button[type="submit"]').style.display = 'inline-block';
+            
+            // 移除选中状态
+            document.querySelectorAll('.content-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+        
+        // 设置标签输入
+        function setupTagInput() {
+            const tagInput = document.getElementById('tagInput');
+            tagInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const tag = this.value.trim();
+                    if (tag) {
+                        addTag(tag);
+                        this.value = '';
+                    }
+                }
+            });
+        }
+        
+        // 添加标签
+        function addTag(tagText) {
+            const container = document.getElementById('tagsContainer');
+            const tagInput = document.getElementById('tagInput');
+            
+            const tag = document.createElement('div');
+            tag.className = 'tag';
+            tag.innerHTML = tagText + '<button type="button" class="tag-remove" onclick="removeTag(this)">×</button>';
+            
+            container.insertBefore(tag, tagInput);
+        }
+        
+        // 移除标签
+        function removeTag(button) {
+            button.parentElement.remove();
+        }
+        
+        // 清空标签
+        function clearTags() {
+            const tags = document.querySelectorAll('.tag');
+            tags.forEach(tag => tag.remove());
+        }
+        
+        // 获取所有标签
+        function getTags() {
+            const tags = document.querySelectorAll('.tag');
+            return Array.from(tags).map(tag => tag.textContent.replace('×', '').trim());
+        }
+        
+        // 设置表单事件
+        function setupForm() {
+            document.getElementById('contentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addContent();
+            });
+        }
+        
+        // 添加内容
+        async function addContent() {
+            const formData = getFormData();
+            console.log('表单数据:', formData);
+            
+            if (!validateFormData(formData)) return;
+            
+            try {
+                updateProgress(30);
+                showAlert('正在保存内容...', 'info');
+                
+                console.log('发送API请求:', JSON.stringify(formData));
+                
+                const response = await fetch('http://localhost:3000/api/add-content', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('API响应状态:', response.status);
+                
+                updateProgress(70);
+                const result = await response.json();
+                console.log('API响应结果:', result);
+                
+                if (response.ok) {
+                    showAlert('内容添加成功！', 'success');
+                    // 设置生成的详情ID（如果API返回了）
+                    if (result.detailId) {
+                        document.getElementById('detailId').value = result.detailId;
+                    }
+                    await loadKnowledgeBase();
+                    // 刷新元数据以包含新的时间点
+                    await loadMetadata();
+                    updateProgress(100);
+                    setTimeout(() => updateProgress(0), 1000);
+                    
+                    // 3秒后提示可以清空表单继续添加
+                    setTimeout(() => {
+                        if (confirm('内容已添加成功！是否清空表单继续添加新内容？')) {
+                            clearForm();
+                        }
+                    }, 3000);
+                } else {
+                    throw new Error(result.error || '添加失败');
+                }
+            } catch (error) {
+                showAlert('添加内容失败: ' + error.message, 'error');
+                updateProgress(0);
+            }
+        }
+        
+        // 更新内容
+        async function updateContent() {
+            if (!selectedContent) return;
+            
+            const formData = getFormData();
+            if (!validateFormData(formData)) return;
+            
+            formData.detailId = selectedContent.content.detailId;
+            
+            try {
+                updateProgress(30);
+                showAlert('正在更新内容...', 'info');
+                
+                const response = await fetch('http://localhost:3000/api/update-content', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                updateProgress(70);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('内容更新成功！', 'success');
+                    await loadKnowledgeBase();
+                    switchToAddMode();
+                    clearForm();
+                    updateProgress(100);
+                    setTimeout(() => updateProgress(0), 1000);
+                } else {
+                    throw new Error(result.error || '更新失败');
+                }
+            } catch (error) {
+                showAlert('更新内容失败: ' + error.message, 'error');
+                updateProgress(0);
+            }
+        }
+        
+        // 删除内容
+        async function deleteContent() {
+            if (!selectedContent) return;
+            
+            if (!confirm('确定要删除这个内容吗？此操作不可恢复。')) return;
+            
+            try {
+                updateProgress(30);
+                showAlert('正在删除内容...', 'info');
+                
+                const response = await fetch('http://localhost:3000/api/delete-content', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        timePoint: selectedContent.timePoint,
+                        industry: selectedContent.industry
+                    })
+                });
+                
+                updateProgress(70);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('内容删除成功！', 'success');
+                    await loadKnowledgeBase();
+                    switchToAddMode();
+                    clearForm();
+                    updateProgress(100);
+                    setTimeout(() => updateProgress(0), 1000);
+                } else {
+                    throw new Error(result.error || '删除失败');
+                }
+            } catch (error) {
+                showAlert('删除内容失败: ' + error.message, 'error');
+                updateProgress(0);
+            }
+        }
+        
+        // 获取表单数据
+        function getFormData() {
+            return {
+                timePoint: document.getElementById('timePoint').value,
+                industry: document.getElementById('industry').value,
+                title: document.getElementById('title').value,
+                summary: document.getElementById('summary').value,
+                importance: document.getElementById('importance').value,
+                tags: getTags(),
+                detailContent: document.getElementById('detailContent').value
+            };
+        }
+        
+        // 验证表单数据
+        function validateFormData(data) {
+            if (!data.timePoint) {
+                showAlert('请选择时间点', 'error');
+                return false;
+            }
+            if (!data.industry) {
+                showAlert('请选择行业', 'error');
+                return false;
+            }
+            if (!data.title) {
+                showAlert('请输入标题', 'error');
+                return false;
+            }
+            if (!data.summary) {
+                showAlert('请输入摘要', 'error');
+                return false;
+            }
+            return true;
+        }
+        
+        // 工具函数
+        function loadCurrentWeek() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            
+            const firstDay = new Date(year, now.getMonth(), 1);
+            const currentDay = now.getDate();
+            const week = Math.ceil((currentDay + firstDay.getDay()) / 7);
+            
+            const timePoint = year + '年' + month + '月第' + week + '周';
+            document.getElementById('timePoint').value = timePoint;
+        }
+        
+        function loadNextWeek() {
+            const now = new Date();
+            now.setDate(now.getDate() + 7);
+            
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const firstDay = new Date(year, now.getMonth(), 1);
+            const currentDay = now.getDate();
+            const week = Math.ceil((currentDay + firstDay.getDay()) / 7);
+            
+            const timePoint = year + '年' + month + '月第' + week + '周';
+            document.getElementById('timePoint').value = timePoint;
+        }
+        
+        // 添加新时间点
+        function addNewTimePoint() {
+            const currentInput = document.getElementById('timePoint').value;
+            let suggestionText = '';
+            
+            if (currentInput) {
+                // 如果已有输入，尝试生成下一个时间点
+                suggestionText = getNextTimePoint(currentInput);
+            } else {
+                // 否则建议未来的时间点
+                const now = new Date();
+                now.setDate(now.getDate() + 7); // 下周
+                const year = now.getFullYear();
+                const month = now.getMonth() + 1;
+                const firstDay = new Date(year, now.getMonth(), 1);
+                const currentDay = now.getDate();
+                const week = Math.ceil((currentDay + firstDay.getDay()) / 7);
+                suggestionText = year + '年' + month + '月第' + week + '周';
+            }
+            
+            const userInput = prompt(
+                '请输入新的时间点 (格式：2025年X月第X周)：\n\n' +
+                '示例格式：\n' +
+                '• 2025年4月第1周\n' +
+                '• 2025年12月第3周\n\n' +
+                '建议时间点：' + suggestionText,
+                suggestionText
+            );
+            
+            if (userInput && userInput.trim()) {
+                const newTimePoint = userInput.trim();
+                
+                // 验证格式
+                if (isValidTimeFormat(newTimePoint)) {
+                    document.getElementById('timePoint').value = newTimePoint;
+                    
+                    // 添加到本地列表（如果不存在）
+                    if (!allTimePoints.includes(newTimePoint)) {
+                        allTimePoints.push(newTimePoint);
+                        // 重新排序时间点
+                        allTimePoints.sort((a, b) => compareTimePoints(a, b));
+                        populateSelects();
+                        showAlert('已添加新时间点：' + newTimePoint, 'info');
+                    }
+                    
+                    generateDetailId();
+                } else {
+                    showAlert('时间点格式不正确，请使用格式：2025年X月第X周', 'error');
+                }
+            }
+        }
+        
+        // 获取下一个时间点
+        function getNextTimePoint(currentTime) {
+            const match = currentTime.match(/(\d{4})年(\d{1,2})月第(\d{1,2})周/);
+            if (!match) return '';
+            
+            let year = parseInt(match[1]);
+            let month = parseInt(match[2]);
+            let week = parseInt(match[3]);
+            
+            week++;
+            if (week > 4) { // 假设每月最多4周
+                week = 1;
+                month++;
+                if (month > 12) {
+                    month = 1;
+                    year++;
+                }
+            }
+            
+            return year + '年' + month + '月第' + week + '周';
+        }
+        
+        // 验证时间格式
+        function isValidTimeFormat(timePoint) {
+            const pattern = /^\d{4}年\d{1,2}月第\d{1,2}周$/;
+            return pattern.test(timePoint);
+        }
+        
+        // 比较时间点大小（用于排序）
+        function compareTimePoints(a, b) {
+            const parseTime = (timeStr) => {
+                const match = timeStr.match(/(\d{4})年(\d{1,2})月第(\d{1,2})周/);
+                if (!match) return 0;
+                const year = parseInt(match[1]);
+                const month = parseInt(match[2]);
+                const week = parseInt(match[3]);
+                return year * 10000 + month * 100 + week;
+            };
+            
+            return parseTime(a) - parseTime(b);
+        }
+        
+        // 生成详情ID预览
+        function generateDetailId() {
+            const timePoint = document.getElementById('timePoint').value;
+            const industry = document.getElementById('industry').value;
+            
+            if (timePoint && industry) {
+                const industryMap = {
+                    '人工智能': 'ai',
+                    '金融科技': 'fintech', 
+                    '新能源': 'energy',
+                    '生物医药': 'biotech',
+                    '区块链': 'blockchain',
+                    '半导体': 'semiconductor',
+                    '新材料': 'materials',
+                    '航空航天': 'aerospace',
+                    '5G通信': '5g',
+                    '元宇宙': 'metaverse',
+                    '机器人': 'robotics',
+                    '其他': 'other'
+                };
+                
+                const industryCode = industryMap[industry] || 'other';
+                
+                // 从时间点提取年月周信息
+                const timeMatch = timePoint.match(/(\d{4})年(\d{1,2})月第(\d{1,2})周/);
+                if (timeMatch) {
+                    const year = timeMatch[1];
+                    const month = timeMatch[2].padStart(2, '0');
+                    const week = timeMatch[3].padStart(2, '0');
+                    
+                    // 只显示预览，不包含时间戳（因为最终ID由服务器生成）
+                    document.getElementById('detailId').placeholder = `${industryCode}_${year}${month}w${week}_xxx (预览)`;
+                }
+            } else {
+                document.getElementById('detailId').placeholder = '保存后自动生成';
+            }
+        }
+        
+        // 设置表单监听器
+        function setupFormListeners() {
+            document.getElementById('timePoint').addEventListener('input', generateDetailId);
+            document.getElementById('industry').addEventListener('change', generateDetailId);
+        }
+        
+        // 切换到添加模式
+        function switchToAddMode() {
+            isEditMode = false;
+            selectedContent = null;
+            document.getElementById('formTitle').textContent = '📝 添加新内容';
+            document.getElementById('updateBtn').style.display = 'none';
+            document.getElementById('deleteBtn').style.display = 'none';
+            
+            // 移除选中状态
+            document.querySelectorAll('.content-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+        
+        // 切换到编辑模式
+        function switchToEditMode() {
+            isEditMode = true;
+            document.getElementById('formTitle').textContent = '✏️ 编辑内容';
+            document.getElementById('updateBtn').style.display = 'inline-block';
+            document.getElementById('deleteBtn').style.display = 'inline-block';
+        }
+
+        function clearForm() {
+            document.getElementById('contentForm').reset();
+            document.getElementById('detailId').value = '';
+            clearTags();
+            switchToAddMode();
+            hidePreview();
+        }
+        
+        function togglePreview() {
+            const section = document.getElementById('previewSection');
+            if (section.style.display === 'none' || !section.style.display) {
+                showPreview();
+            } else {
+                hidePreview();
+            }
+        }
+        
+        function showPreview() {
+            const formData = getFormData();
+            const previewContent = document.getElementById('previewContent');
+            const previewSection = document.getElementById('previewSection');
+            
+            previewContent.innerHTML = '<h3>' + (formData.title || '标题') + '</h3>' +
+                '<p><strong>时间:</strong> ' + (formData.timePoint || '未选择') + '</p>' +
+                '<p><strong>行业:</strong> ' + (formData.industry || '未选择') + '</p>' +
+                '<p><strong>重要性:</strong> ' + (formData.importance || '中') + '</p>' +
+                '<p><strong>标签:</strong> ' + (formData.tags.join(', ') || '无') + '</p>' +
+                '<p><strong>摘要:</strong></p><p>' + (formData.summary || '无摘要') + '</p>' +
+                '<p><strong>详细内容:</strong></p>' +
+                '<div style="background: white; padding: 15px; border-radius: 4px; white-space: pre-wrap;">' + 
+                (formData.detailContent || '无详细内容') + '</div>';
+            
+            previewSection.style.display = 'block';
+        }
+        
+        function hidePreview() {
+            document.getElementById('previewSection').style.display = 'none';
+        }
+        
+        function filterContent() {
+            const searchTerm = document.getElementById('searchContent').value.toLowerCase();
+            const items = document.querySelectorAll('.content-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        function updateStats() {
+            document.getElementById('totalCount').textContent = getTotalContentCount();
+            document.getElementById('timePointCount').textContent = allTimePoints.length;
+            document.getElementById('industryCount').textContent = allIndustries.length;
+        }
+        
+        function getTotalContentCount() {
+            if (!knowledgeBase || !knowledgeBase.content) return 0;
+            
+            let count = 0;
+            Object.keys(knowledgeBase.content).forEach(timePoint => {
+                count += Object.keys(knowledgeBase.content[timePoint]).length;
+            });
+            return count;
+        }
+        
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+        
+        function showAlert(message, type) {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.display = 'none';
+            });
+            
+            const alert = document.getElementById(type + 'Alert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
