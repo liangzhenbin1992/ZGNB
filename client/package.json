@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx vite build",
     "preview": "vite preview",
-    "vercel-build": "npm run build"
+    "vercel-build": "npx vite build",
+    "debug-build": "node build-check.js"
   },
   "dependencies": {
     "vue": "^3.3.4",
