@@ -14,10 +14,9 @@
     "element-plus": "^2.3.8",
     "@element-plus/icons-vue": "^2.1.0",
     "axios": "^1.4.0",
-    "marked": "^5.1.1"
+    "marked": "^5.1.1",
+    "vite": "^4.4.5",
+    "@vitejs/plugin-vue": "^4.2.3"
   },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^4.2.3",
-    "vite": "^4.4.5"
-  }
+  "devDependencies": {}
 } 
