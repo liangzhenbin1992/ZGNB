@@ -194,7 +194,7 @@
 </template>
 
 <script>
-import api from '@/utils/api'
+import axios from 'axios'
 
 export default {
   name: 'KnowledgeBase',
@@ -235,7 +235,7 @@ export default {
     async loadKnowledgeBase() {
       try {
         this.loading = true
-        const response = await api.get('/knowledge-base')
+        const response = await axios.get('/api/knowledge-base')
         this.knowledgeData = response.data
         this.industries = response.data.industries || []
         this.timePoints = response.data.timePoints || []
@@ -280,7 +280,7 @@ export default {
       this.detailLoading = true
       
       try {
-                  const response = await api.get(`/detail/${content.detailId}`)
+        const response = await axios.get(`/api/detail/${content.detailId}`)
         this.detailContent = response.data.content
         this.currentDetailId = content.detailId
       } catch (error) {

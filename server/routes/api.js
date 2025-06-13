@@ -3,65 +3,13 @@ const router = express.Router();
 const fs = require('fs-extra');
 const path = require('path');
 
-// ============= 认证相关API =============
-
-// 验证访问密码
-router.post('/auth/verify', (req, res) => {
-  try {
-    const { password } = req.body;
-    const accessPassword = process.env.ACCESS_PASSWORD || '1234'; // 默认密码
-    
-    if (!password) {
-      return res.status(400).json({ error: '请输入密码' });
-    }
-    
-    if (password === accessPassword) {
-      // 生成简单的访问令牌
-      const token = Buffer.from(`verified_${Date.now()}`).toString('base64');
-      res.json({ 
-        success: true, 
-        message: '验证成功',
-        token 
-      });
-    } else {
-      res.status(401).json({ error: '密码错误' });
-    }
-  } catch (error) {
-    console.error('密码验证失败:', error);
-    res.status(500).json({ error: '验证服务异常' });
-  }
-});
-
-// 权限检查中间件
-const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization;
-  
-  if (!token) {
-    return res.status(401).json({ error: '需要认证' });
-  }
-  
-  try {
-    // 简单的token验证（在生产环境中应该使用更安全的方式）
-    const decoded = Buffer.from(token, 'base64').toString();
-    if (decoded.startsWith('verified_')) {
-      next();
-    } else {
-      res.status(401).json({ error: '无效的访问令牌' });
-    }
-  } catch (error) {
-    res.status(401).json({ error: '无效的访问令牌' });
-  }
-};
-
-// ============= 原有API =============
-
 // 数据文件路径
 const DATA_DIR = path.join(__dirname, '../data');
 const KNOWLEDGE_BASE_FILE = path.join(DATA_DIR, 'knowledge-base.json');
 const DETAILS_DIR = path.join(DATA_DIR, 'details');
 
-// 获取主数据（需要认证）
-router.get('/knowledge-base', authMiddleware, async (req, res) => {
+// 获取主数据
+router.get('/knowledge-base', async (req, res) => {
   try {
     const data = await fs.readJson(KNOWLEDGE_BASE_FILE);
     res.json(data);
@@ -71,8 +19,8 @@ router.get('/knowledge-base', authMiddleware, async (req, res) => {
   }
 });
 
-// 获取详情内容（需要认证）
-router.get('/detail/:detailId', authMiddleware, async (req, res) => {
+// 获取详情内容
+router.get('/detail/:detailId', async (req, res) => {
   try {
     const { detailId } = req.params;
     const detailFile = path.join(DETAILS_DIR, `${detailId}.md`);
@@ -89,8 +37,8 @@ router.get('/detail/:detailId', authMiddleware, async (req, res) => {
   }
 });
 
-// 获取筛选选项（需要认证）
-router.get('/filters', authMiddleware, async (req, res) => {
+// 获取筛选选项
+router.get('/filters', async (req, res) => {
   try {
     const data = await fs.readJson(KNOWLEDGE_BASE_FILE);
     res.json({

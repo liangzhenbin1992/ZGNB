@@ -42,13 +42,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: '服务器内部错误' });
 });
 
-// 如果是本地运行，启动服务器
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
-    console.log(`📚 知识库网站已启动`);
-  });
-}
-
-// 导出应用供 Vercel 使用
-module.exports = app; 
+app.listen(PORT, () => {
+  console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
+  console.log(`📚 知识库网站已启动`);
+}); 

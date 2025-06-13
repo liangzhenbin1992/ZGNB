@@ -7,10 +7,9 @@
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "server:dev": "nodemon server/app.js",
     "client:dev": "cd client && npm run dev",
-    "build": "cd client && npm install && npm run build",
+    "build": "cd client && npm run build",
     "start": "node server/app.js",
-    "setup": "npm install && cd client && npm install",
-    "vercel-build": "cd client && npm install && npm run build"
+    "setup": "npm install && cd client && npm install"
   },
   "dependencies": {
     "express": "^4.18.2",
