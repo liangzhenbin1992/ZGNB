@@ -1,0 +1,121 @@
+{
+  "categories": [
+    "产品设计",
+    "技术架构",
+    "管理方法",
+    "分析框架",
+    "创新思维",
+    "商业模式",
+    "用户研究",
+    "数据分析",
+    "Z家军行军准则"
+  ],
+  "methodologies": [
+    {
+      "id": "prod_285576",
+      "category": "产品设计",
+      "title": "机器人要如何进行发展？",
+      "summary": "机器人要如何进行发展？机器人要如何进行发展？机器人要如何进行发展？机器人要如何进行发展？",
+      "difficulty": "intermediate",
+      "tags": [
+        "机器人",
+        "robot"
+      ],
+      "views": 0,
+      "rating": 3,
+      "updatedAt": "2025-06-13"
+    },
+    {
+      "id": "other_343930",
+      "category": "Z家军行军准则",
+      "title": "核心原则",
+      "summary": "1. 核心指导思想\n\n2. 四大操作原则\n\n3. 其他重要原则",
+      "difficulty": "intermediate",
+      "tags": [
+        "四大原则"
+      ],
+      "views": 0,
+      "rating": 3,
+      "updatedAt": "2025-06-13"
+    },
+    {
+      "id": "other_387825",
+      "category": "Z家军行军准则",
+      "title": "看懂一张图，一生不缺钱",
+      "summary": "Z哥做队长的完整过程，从左侧建仓，到左侧转右侧，一共六个买点，每个买点的逻辑和方法。",
+      "difficulty": "intermediate",
+      "tags": [
+        "建仓",
+        "队长",
+        "左侧票"
+      ],
+      "views": 0,
+      "rating": 3,
+      "updatedAt": "2025-06-13"
+    },
+    {
+      "id": "prod_001",
+      "category": "产品设计",
+      "title": "用户故事地图方法",
+      "summary": "通过用户故事地图来梳理产品功能优先级和用户旅程的系统性方法",
+      "difficulty": "intermediate",
+      "tags": [
+        "用户体验",
+        "产品规划",
+        "敏捷开发",
+        "用户旅程"
+      ],
+      "views": 1250,
+      "rating": 4.5,
+      "updatedAt": "2024-01-15"
+    },
+    {
+      "id": "tech_001",
+      "category": "技术架构",
+      "title": "微服务架构设计原则",
+      "summary": "构建可扩展、高可用微服务系统的核心设计原则和最佳实践",
+      "difficulty": "advanced",
+      "tags": [
+        "微服务",
+        "系统设计",
+        "架构",
+        "可扩展性"
+      ],
+      "views": 2100,
+      "rating": 4.8,
+      "updatedAt": "2024-01-12"
+    },
+    {
+      "id": "mgmt_001",
+      "category": "管理方法",
+      "title": "OKR目标管理法",
+      "summary": "通过OKR（目标与关键结果）来实现团队目标对齐和高效执行",
+      "difficulty": "beginner",
+      "tags": [
+        "目标管理",
+        "OKR",
+        "团队协作",
+        "绩效管理"
+      ],
+      "views": 890,
+      "rating": 4.2,
+      "updatedAt": "2024-01-10"
+    },
+    {
+      "id": "analysis_001",
+      "category": "分析框架",
+      "title": "SWOT分析法",
+      "summary": "系统分析优势、劣势、机会、威胁的经典战略分析工具",
+      "difficulty": "beginner",
+      "tags": [
+        "战略分析",
+        "SWOT",
+        "竞争分析",
+        "决策工具"
+      ],
+      "views": 1560,
+      "rating": 4,
+      "updatedAt": "2024-01-08"
+    }
+  ]
+}

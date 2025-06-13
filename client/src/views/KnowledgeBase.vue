@@ -299,7 +299,7 @@ export default {
     },
     
     formatMarkdown(content) {
-      // 简单的markdown转HTML
+      // 简单的markdown转HTML，支持图片显示
       return content
         .replace(/^# (.*$)/gim, '<h1>$1</h1>')
         .replace(/^## (.*$)/gim, '<h2>$1</h2>')
@@ -308,6 +308,7 @@ export default {
         .replace(/^\- (.*$)/gim, '<li>$1</li>')
         .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+        .replace(/!\[(.*?)\]\((.*?)\)/gim, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; margin: 15px auto; display: block; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />')
         .replace(/\n/gim, '<br>')
     },
     
@@ -750,6 +751,21 @@ export default {
   margin: 5px 0;
   list-style-type: disc;
   margin-left: 20px;
+}
+
+.detail-content :deep(img) {
+  max-width: 100%;
+  height: auto;
+  margin: 20px auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.detail-content :deep(img:hover) {
+  transform: scale(1.02);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
 }
 
 .no-detail {

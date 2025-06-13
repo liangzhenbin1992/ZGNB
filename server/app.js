@@ -8,7 +8,9 @@ const PORT = process.env.PORT || 3000;
 
 // 中间件
 app.use(cors());
-app.use(express.json());
+// 增加请求体大小限制以支持Base64图片上传
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // 检查是否有构建后的文件，如果没有则使用源文件
 const clientDistPath = path.join(__dirname, '../client/dist');
 const clientSrcPath = path.join(__dirname, '../client');
