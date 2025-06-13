@@ -12,6 +12,33 @@ const DETAILS_DIR = path.join(DATA_DIR, 'details');
 router.get('/knowledge-base', async (req, res) => {
   try {
     const data = await fs.readJson(KNOWLEDGE_BASE_FILE);
+    
+    // 确保时间点按倒序排列（最新的在前面）
+    if (data.timePoints && Array.isArray(data.timePoints)) {
+      data.timePoints.sort((a, b) => {
+        // 提取年、月、周进行比较
+        const parseTime = (tp) => {
+          const match = tp.match(/(\d{4})年(\d+)月第(\d+)周/);
+          if (match) {
+            return {
+              year: parseInt(match[1]),
+              month: parseInt(match[2]),
+              week: parseInt(match[3])
+            };
+          }
+          return { year: 0, month: 0, week: 0 };
+        };
+        
+        const timeA = parseTime(a);
+        const timeB = parseTime(b);
+        
+        // 倒序排序：最新的时间在前面
+        if (timeA.year !== timeB.year) return timeB.year - timeA.year;
+        if (timeA.month !== timeB.month) return timeB.month - timeA.month;
+        return timeB.week - timeA.week;
+      });
+    }
+    
     res.json(data);
   } catch (error) {
     console.error('读取知识库数据失败:', error);
@@ -81,7 +108,7 @@ router.post('/add-content', async (req, res) => {
     // 确保时间点存在
     if (!knowledgeBase.timePoints.includes(timePoint)) {
       knowledgeBase.timePoints.push(timePoint);
-      // 按时间顺序排序
+      // 按时间倒序排序（最新的在前面）
       knowledgeBase.timePoints.sort((a, b) => {
         // 提取年、月、周进行比较
         const parseTime = (tp) => {
@@ -99,9 +126,10 @@ router.post('/add-content', async (req, res) => {
         const timeA = parseTime(a);
         const timeB = parseTime(b);
         
-        if (timeA.year !== timeB.year) return timeA.year - timeB.year;
-        if (timeA.month !== timeB.month) return timeA.month - timeB.month;
-        return timeA.week - timeB.week;
+        // 倒序排序：最新的时间在前面
+        if (timeA.year !== timeB.year) return timeB.year - timeA.year;
+        if (timeA.month !== timeB.month) return timeB.month - timeA.month;
+        return timeB.week - timeA.week;
       });
     }
     

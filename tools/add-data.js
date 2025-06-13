@@ -85,7 +85,7 @@ function generateDetailId(industry, timePoint) {
   return `${industryCode}_${Date.now()}_${timestamp}`;
 }
 
-// 时间点排序函数
+// 时间点排序函数（倒序：最新的在前面）
 function sortTimePoints(timePoints) {
   return timePoints.sort((a, b) => {
     const parseTime = (tp) => {
@@ -103,9 +103,10 @@ function sortTimePoints(timePoints) {
     const timeA = parseTime(a);
     const timeB = parseTime(b);
     
-    if (timeA.year !== timeB.year) return timeA.year - timeB.year;
-    if (timeA.month !== timeB.month) return timeA.month - timeB.month;
-    return timeA.week - timeB.week;
+    // 倒序排序：最新的时间在前面
+    if (timeA.year !== timeB.year) return timeB.year - timeA.year;
+    if (timeA.month !== timeB.month) return timeB.month - timeA.month;
+    return timeB.week - timeA.week;
   });
 }
 

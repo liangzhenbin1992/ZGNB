@@ -951,7 +951,7 @@
             return pattern.test(timePoint);
         }
         
-        // 比较时间点大小（用于排序）
+        // 比较时间点大小（用于排序，倒序：最新的在前面）
         function compareTimePoints(a, b) {
             const parseTime = (timeStr) => {
                 const match = timeStr.match(/(\d{4})年(\d{1,2})月第(\d{1,2})周/);
@@ -962,7 +962,8 @@
                 return year * 10000 + month * 100 + week;
             };
             
-            return parseTime(a) - parseTime(b);
+            // 倒序排序：最新的时间在前面
+            return parseTime(b) - parseTime(a);
         }
         
         // 生成详情ID预览
