@@ -207,6 +207,14 @@
               </span>
             </div>
             
+            <!-- 操作按钮区域 -->
+            <div class="detail-actions">
+              <el-button type="primary" @click="openInNewPage" size="small">
+                <el-icon><Link /></el-icon>
+                在新页面打开
+              </el-button>
+            </div>
+            
             <div class="detail-tags">
               <el-tag
                 v-for="tag in currentItem.tags"
@@ -241,7 +249,8 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Search, Refresh, View, Calendar, Document } from '@element-plus/icons-vue'
+import { Search, Refresh, View, Calendar, Document, Link } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 export default {
@@ -251,9 +260,11 @@ export default {
     Refresh,
     View,
     Calendar,
-    Document
+    Document,
+    Link
   },
   setup() {
+    const router = useRouter()
     const loading = ref(true)
     const detailLoading = ref(false)
     const methodologies = ref([])
@@ -394,8 +405,8 @@ export default {
 
     const formatMarkdown = (content) => {
       return content
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 style="color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 12px; margin-bottom: 20px; font-size: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">$1</h1>')
+        .replace(/^## (.*$)/gim, '<h2 style="color: #764ba2; margin-top: 30px; margin-bottom: 15px; font-size: 24px; font-weight: 700;">$1</h2>')
         .replace(/^### (.*$)/gim, '<h3>$1</h3>')
         .replace(/^\* (.*$)/gim, '<li>$1</li>')
         .replace(/^\- (.*$)/gim, '<li>$1</li>')
@@ -403,6 +414,52 @@ export default {
         .replace(/\*(.*?)\*/gim, '<em>$1</em>')
         .replace(/!\[(.*?)\]\((.*?)\)/gim, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; margin: 15px auto; display: block; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />')
         .replace(/\n/gim, '<br>')
+    }
+
+    // 在新页面打开文章详情
+    const openInNewPage = () => {
+      if (!currentItem.value) {
+        console.error('当前文章数据为空')
+        ElMessage.error('当前文章数据为空，无法打开新页面')
+        return
+      }
+      
+      console.log('准备在新页面打开文章:', currentItem.value.title)
+      console.log('当前文章数据:', currentItem.value)
+      console.log('详细内容长度:', detailContent.value ? detailContent.value.length : 0)
+      
+      try {
+        // 生成唯一的存储键
+        const storageKey = `methodology_detail_${currentItem.value.id}_${Date.now()}`
+        
+        // 准备数据
+        const routeData = {
+          item: currentItem.value,
+          content: detailContent.value || getMockContent(currentItem.value)
+        }
+        
+        // 将数据存储到 sessionStorage
+        sessionStorage.setItem(storageKey, JSON.stringify(routeData))
+        
+        console.log('数据已存储到 sessionStorage，键:', storageKey)
+        
+        // 生成URL，通过路径参数传递存储键
+        const url = router.resolve({
+          name: 'MethodologyDetail',
+          params: { id: currentItem.value.id },
+          query: { key: storageKey }
+        }).href
+        
+        console.log('生成的URL:', url)
+        
+        // 在新标签页中打开
+        window.open(url, '_blank')
+        ElMessage.success('正在新页面中打开文章...')
+        
+      } catch (error) {
+        console.error('打开新页面失败:', error)
+        ElMessage.error('打开新页面失败，请重试')
+      }
     }
 
     // 模拟数据
@@ -554,6 +611,7 @@ ${item.summary}
       currentItem,
       loadMethodologies,
       openDetail,
+      openInNewPage,
       toggleCategory,
       applyFilters,
       resetFilters,
@@ -776,6 +834,39 @@ ${item.summary}
 .detail-date {
   font-size: 14px;
   color: #95a5a6;
+}
+
+.detail-actions {
+  margin: 20px 0;
+  text-align: right;
+}
+
+.detail-actions .el-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.25);
+  height: auto;
+  line-height: 1.6;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-actions .el-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a6edf 0%, #6a3b9c 100%);
+}
+
+.detail-actions .el-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
 }
 
 .detail-tags {

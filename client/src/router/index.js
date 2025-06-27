@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import KnowledgeBase from '../views/KnowledgeBase.vue'
 import Methodology from '../views/Methodology.vue'
+import MethodologyDetail from '../views/MethodologyDetail.vue'
 
 const routes = [
   {
@@ -12,6 +13,12 @@ const routes = [
     path: '/methodology',
     name: 'Methodology',
     component: Methodology
+  },
+  {
+    path: '/methodology/detail/:id',
+    name: 'MethodologyDetail',
+    component: MethodologyDetail,
+    props: true
   }
 ]
 

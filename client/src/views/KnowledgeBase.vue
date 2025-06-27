@@ -180,7 +180,7 @@
       v-model="drawerVisible"
       :title="drawerTitle"
       direction="rtl"
-      size="40%"
+      size="60%"
       :before-close="closeDrawer"
     >
       <div class="detail-content" v-loading="detailLoading">

@@ -664,6 +664,24 @@
             margin-bottom: 12px;
             backdrop-filter: blur(5px);
         }
+        
+        /* 简化图片显示样式 */
+        #detailContent {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        
+        /* 图片占位符样式提示 */
+        .image-compact-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: inline-block;
+            margin: 2px 4px;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
 
         @media (max-width: 768px) {
             .form-row {
@@ -1138,13 +1156,39 @@
             await loadMethodologyDetail(methodology.id);
         }
         
+        // 将完整的图片代码转换为简化格式用于编辑
+        function convertImageToCompact(content) {
+            return content.replace(/!\[(.*?)\]\(data:image\/([^;]+);base64,([^)]+)\)/g, function(match, alt, format, base64Data) {
+                // 生成唯一的图片ID
+                const imageId = `img_${++imageIdCounter}_${Date.now()}`;
+                
+                // 存储完整的图片数据
+                const fullData = `data:image/${format};base64,${base64Data}`;
+                imageDataMap.set(imageId, {
+                    data: fullData,
+                    description: alt,
+                    fileName: `image.${format}`,
+                    size: Math.round(base64Data.length * 0.75) // 估算文件大小
+                });
+                
+                // 计算文件大小
+                const estimatedSize = Math.round(base64Data.length * 0.75);
+                const fileSize = formatFileSize(estimatedSize);
+                
+                // 返回简化显示
+                return `![${alt}][📷图片:${format.toUpperCase()}_${fileSize}_ID:${imageId}]`;
+            });
+        }
+        
         // 加载方法论详情
         async function loadMethodologyDetail(id) {
             try {
                 const response = await fetch(`http://localhost:3000/api/methodology-detail/${id}`);
                 if (response.ok) {
                     const data = await response.json();
-                    document.getElementById('detailContent').value = data.content;
+                    // 将完整的图片代码转换为简化格式
+                    const compactContent = convertImageToCompact(data.content);
+                    document.getElementById('detailContent').value = compactContent;
                 } else {
                     document.getElementById('detailContent').value = '';
                 }
@@ -1319,6 +1363,10 @@
         
         // 获取表单数据
         function getFormData() {
+            // 获取详细内容并还原图片数据
+            const detailContent = document.getElementById('detailContent').value.trim();
+            const restoredDetailContent = restoreImageData(detailContent);
+            
             return {
                 category: getSelectedCategory(),
                 title: document.getElementById('title').value.trim(),
@@ -1326,7 +1374,7 @@
                 difficulty: document.getElementById('difficulty').value,
                 rating: parseFloat(document.getElementById('rating').value),
                 tags: getTags(),
-                content: document.getElementById('detailContent').value.trim()
+                content: restoredDetailContent
             };
         }
         
@@ -1696,6 +1744,21 @@ SWOT分析是一种战略规划工具，帮助组织识别内部优势劣势和�
             previewArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         
+        // 创建简化的图片显示
+        function createCompactImageDisplay(description, imageData, fileName) {
+            // 获取图片格式
+            const format = fileName.split('.').pop().toUpperCase();
+            const dataPrefix = imageData.substring(0, 30); // 只显示前30个字符
+            const fileSize = formatFileSize(currentImageData.size);
+            
+            // 创建简化显示的图片标记
+            return `![${description}](${dataPrefix}...${format}_${fileSize})`;
+        }
+        
+        // 存储完整的图片数据映射
+        let imageDataMap = new Map();
+        let imageIdCounter = 0;
+        
         // 插入选中的图片
         function insertSelectedImage() {
             if (!currentImageData) {
@@ -1706,7 +1769,21 @@ SWOT分析是一种战略规划工具，帮助组织识别内部优势劣势和�
             const altText = prompt('请输入图片描述（用于SEO和无障碍访问）:', currentImageData.name.replace(/\.[^/.]+$/, ""));
             const description = altText || currentImageData.name.replace(/\.[^/.]+$/, "");
             
-            const markdownImage = `![${description}](${currentImageData.data})`;
+            // 生成唯一的图片ID
+            const imageId = `img_${++imageIdCounter}_${Date.now()}`;
+            
+            // 存储完整的图片数据
+            imageDataMap.set(imageId, {
+                data: currentImageData.data,
+                description: description,
+                fileName: currentImageData.name,
+                size: currentImageData.size
+            });
+            
+            // 创建简化的显示文本
+            const format = currentImageData.name.split('.').pop().toUpperCase();
+            const fileSize = formatFileSize(currentImageData.size);
+            const compactDisplay = `![${description}][📷图片:${format}_${fileSize}_ID:${imageId}]`;
             
             // 插入到光标位置
             const textarea = document.getElementById('detailContent');
@@ -1715,7 +1792,7 @@ SWOT分析是一种战略规划工具，帮助组织识别内部优势劣势和�
             const textAfter = textarea.value.substring(cursorPos);
             
             // 确保图片前后有换行
-            let insertText = markdownImage;
+            let insertText = compactDisplay;
             if (textBefore && !textBefore.endsWith('\n')) {
                 insertText = '\n\n' + insertText;
             }
@@ -1731,7 +1808,7 @@ SWOT分析是一种战略规划工具，帮助组织识别内部优势劣势和�
             textarea.setSelectionRange(newCursorPos, newCursorPos);
             
             closeImagePreview();
-            showAlert('图片插入成功！图片已嵌入到内容中', 'success');
+            showAlert(`图片插入成功！显示为简化格式，文件：${currentImageData.name}`, 'success');
         }
         
         // 插入图片URL
@@ -1775,6 +1852,18 @@ SWOT分析是一种战略规划工具，帮助组织识别内部优势劣势和�
             currentImageData = null;
         }
         
+        // 还原图片数据用于预览和保存
+        function restoreImageData(content) {
+            // 将简化的图片显示还原为完整的markdown格式
+            return content.replace(/!\[(.*?)\]\[📷图片:.*?_ID:(img_\d+_\d+)\]/g, function(match, alt, imageId) {
+                const imageInfo = imageDataMap.get(imageId);
+                if (imageInfo) {
+                    return `![${alt}](${imageInfo.data})`;
+                }
+                return match; // 如果找不到对应的图片数据，保持原样
+            });
+        }
+        
         // 预览Markdown内容
         function previewMarkdown() {
             const content = document.getElementById('detailContent').value;
@@ -1783,8 +1872,11 @@ SWOT分析是一种战略规划工具，帮助组织识别内部优势劣势和�
                 return;
             }
             
+            // 还原图片数据后再渲染
+            const restoredContent = restoreImageData(content);
+            
             // 简单的Markdown渲染
-            const htmlContent = content
+            const htmlContent = restoredContent
                 .replace(/^# (.*$)/gim, '<h1>$1</h1>')
                 .replace(/^## (.*$)/gim, '<h2>$1</h2>')
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
